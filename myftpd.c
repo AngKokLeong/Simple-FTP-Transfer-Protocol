@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "FTP_SERVER/ftp_server_driver.c"
+
 
 struct sockaddr_in server, client;
 
@@ -34,16 +36,9 @@ int initialize_daemon_process(){
 
 int main(int argc , char *argv[])
 {
-	pid_t pid;
-	
-	char *hostname;
-	char *ip_address;
-
-	char *initial_current_directory;
 
 	if(argc == 2){
-		initial_current_directory = argv[1];
-		printf("The file path that myftpd server will be serving: %s\n", initial_current_directory); 
+		ftp_server_driver(argv[1]);
 	}else{
 		printf("Please key in the file path you want to setup the FTP\n");
 		printf("Terminating program....\n");
