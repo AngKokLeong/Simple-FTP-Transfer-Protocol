@@ -1,40 +1,38 @@
-/*
- * file:	ftp_server.h
- * author:	Ang Kok Leong
- * purpose:	To create a separate code for FTP server to allow easy code extend in the future
- * date:	20/03/2021
- */
-
-#include <stdlib.h>
-#include <stdio.h>
+#include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h> //superset of <netinet/in.h>
+#include <sys/time.h>
+#include <sys/wait.h>
 
-typedef struct {
+#include <netinet/in.h>
+
+#include <errno.h>
+#include <netdb.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct{
 	int socket;
-	int port_number;
+	socklen_t length;
 	struct sockaddr_in ftp_server_ipv4;
 	struct sockaddr_in6 ftp_server_ipv6;
-	struct hostent *host_information;
+	
 }FTP_SERVER_INFORMATION;
 
 
 FTP_SERVER_INFORMATION construct_ftp_server_information();
 void destruct_ftp_server_information(FTP_SERVER_INFORMATION ftp_server_information);
 
+int initialize_socket_ipv6(FTP_SERVER_INFORMATION *ftp_server_information);
+int initialize_socket_ipv4(FTP_SERVER_INFORMATION *ftp_server_information);
 
-int initialize_socket_ipv6(char *hostname);
-int initialize_socket_ipv4(char *hostname);
+void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client);
+void handle_ipv6_connection();
 
-char* get_server_hostname();
-int generate_port_number();
+void handle_ipv4_socket(int socket_file_descriptor);
+void handle_ipv6_socket(int socket_file_descriptor);
 
-int set_server_address_ipv6(FTP_SERVER_INFORMATION ftp_server_information, char *hostname, int port_number);
-int setup_ftp_connectioN_ipv6(int socket_file_descriptor, FTP_SERVER_INFORMATION *ftp_server_information);
+void reap_zombie_processes();
 
-int test_write(int socket_file_descriptor);
-void close_socket(int socket_file_descriptor);
-
-
+int start_ftp_server(char *file_path_to_serve);
