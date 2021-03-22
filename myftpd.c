@@ -1,50 +1,21 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-#include <sys/sendfile.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/stat.h>
 
 #include "FTP_SERVER/ftp_server_driver.c"
-
-
-struct sockaddr_in server, client;
-
-int initialize_daemon_process(){
-	pid_t pid;
-	
-	pid = fork();
-	if(pid < 0)
-		return -1;
-	else if(pid != 0){
-		printf("server pid = %d\n", pid);
-		exit(EXIT_SUCCESS);
-	}
-
-	setsid();
-	chdir("/");
-	umask(0);
-	
-	return 0;	
-}
-
-
 
 int main(int argc , char *argv[])
 {
 
 	if(argc == 2){
+		
 		ftp_server_driver(argv[1]);
 	}else{
 		printf("Please key in the file path you want to setup the FTP\n");
 		printf("Terminating program....\n");
 		exit(EXIT_FAILURE);
 	}
-
+	
 	exit(EXIT_SUCCESS);
 	/*
 
