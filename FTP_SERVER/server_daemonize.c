@@ -2,7 +2,7 @@
 #include <syslog.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include <stdlib.h>
 /*
 int daemonize_server_process(){
 	
@@ -64,7 +64,7 @@ int daemonize_ftp_server_process(){
 	
 	int daemon_creation_status;
 
-	daemon_creation_status = daemon();
+	daemon_creation_status = daemon(0, 0);
 	
 	if(daemon_creation_status == 0){
 		//write a log that daemon have been created successfully
