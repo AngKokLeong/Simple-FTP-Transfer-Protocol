@@ -15,26 +15,23 @@
 typedef struct {
 	int socket;
 	int port_number;
+	char *hostname;
 	struct sockaddr_in ftp_server_ipv4;
 	struct sockaddr_in6 ftp_server_ipv6;
 	struct hostent *host_information;
+	int socket_file_descriptor;
 }FTP_CLIENT_INFORMATION;
-
 
 FTP_CLIENT_INFORMATION construct_ftp_client_information();
 void destruct_ftp_client_information(FTP_CLIENT_INFORMATION ftp_client_information);
 
-
-int initialize_socket_ipv6(char *hostname);
-int initialize_socket_ipv4(char *hostname);
-
-char* get_server_hostname();
 int generate_port_number();
 
-int set_server_address_ipv6(FTP_CLIENT_INFORMATION ftp_client_information, char *hostname, int port_number);
-int setup_ftp_connectioN_ipv6(int socket_file_descriptor, FTP_CLIENT_INFORMATION *ftp_client_information);
+int set_server_address_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information);
+int setup_ftp_connection_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information);
+
+int set_server_address_ipv6(FTP_CLIENT_INFORMATION ftp_client_information);
+int setup_ftp_connection_ipv6(FTP_CLIENT_INFORMATION *ftp_client_information);
 
 int test_write(int socket_file_descriptor);
 void close_socket(int socket_file_descriptor);
-
-
