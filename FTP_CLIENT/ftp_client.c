@@ -4,7 +4,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> //superset of <netinet/in.h>
-
 #include <errno.h>
 
 #include "ftp_server.h"
@@ -42,10 +41,20 @@ int generate_port_number(){
 	return port_number;
 }
 
+
+int open_socket_ipv4(int *socket_file_descriptor){
+	if((socket_file_descriptor = socket(PF_INET, SOCK_STREAM, 0)) < 0){
+		perror("problem connection stream socket ipv4");
+		exit(EXIT_FAILURE);
+	}
+
+	return EXIT_SUCCESS;
+}
+
 int open_socket_ipv6(int *socket_file_descriptor){
 	
 	if((socket_file_descriptor = socket(PF_INET6, SOCK_STREAM, 0)) < 0) {
-		perror("problem connecting stream socket");
+		perror("problem connecting stream socket ipv6");
 		exit(EXIT_FAILURE);
 	}
 
@@ -53,22 +62,48 @@ int open_socket_ipv6(int *socket_file_descriptor){
 	return EXIT_SUCCESS;
 }
 
+int set_server_address_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information, char *hostname, int port_number){
+	ftp_client_information.ftp_server_ipv4.sin_family = AF_INET;
+	if((ftp_client_information.host_information = gethostbyname2(hostname, AF_INET)) == NULL){
+		(void) fprintf(stderr, "%s: unknown host \n", hostname);
+		exit(EXIT_FAILURE);
+	}
+
+	bcopy(ftp_client_information->host_information->h_addr, ftp_client_information->ftp_server_ipv4->sin_addr, ftp_client_information->host_information->h_length);
+	ftp_client_information.ftp_server_ipv4.sin_port = htons(port_number);
+	
+	//log the server address have been set properly for this client
+	return EXIT_SUCCESS;
+}
 
 int set_server_address_ipv6(FTP_CLIENT_INFORMATION *ftp_client_information, char *hostname, int port_number){
-	ftp_client_information.sin6_family = PF_INET6;
+	ftp_client_information.ftp_server_ipv6.sin6_family = PF_INET6;
 	if((ftp_client_information.host_information = gethostbyname2(hostname, PF_INET6)) == NULL){
 		(void) fprintf(stderr, "%s: unknown host \n", hostname);
 		exit(EXIT_FAILURE);
 	}
 	
-	bcopy(host_information->h_addr, &ftp_client_information.ftp_server_in6.sin6_addr, host_information->h_length);
+	bcopy(ftp_client_information->host_information->h_addr, &ftp_client_information->ftp_server_ipv6.sin6_addr, ftp_client_information->host_information->h_length);
 	
-	ftp_client_information.sin6_port = htons(port_number);
+	ftp_client_information.ftp_server_ipv6.sin6_port = htons(port_number);
 	
-	//log that the server address have been set properly
+	//log that the server address have been set properly for this client
 
 	return EXIT_SUCCESS;
 }
+
+int setup_ftp_connection_ipv4(int socket_file_descriptor, FTP_CLIENT_INFORMATION *ftp_client_information){
+	if(connect(socket_file_descriptor, (struct sockaddr *) ftp_client_information.ftp_server_ipv4, sizeof(ftp_client_information.ftp_server_ipv4)) < 0){
+		perror("connecting stream socket ipv4");
+		exit(EXIT_FAILURE);
+	}
+	
+	//log the success of creating stream socket in ipv4
+	//
+	return EXIT_SUCCESS;
+}
+
+
 
 int setup_ftp_connection_ipv6(int socket_file_descriptor, FTP_CLIENT_INFORMATION *ftp_client_information){
 	
@@ -80,7 +115,7 @@ int setup_ftp_connection_ipv6(int socket_file_descriptor, FTP_CLIENT_INFORMATION
 	}
 	
 
-	//log the success of creating stream socket
+	//log the success of creating stream socket in ipv6
 	
 	return EXIT_SUCCESS;
 }
