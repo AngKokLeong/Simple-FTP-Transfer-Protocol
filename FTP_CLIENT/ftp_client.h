@@ -9,10 +9,15 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> //superset of <netinet/in.h>
+#include <errno.h>
+#include <netdb.h>
+#include <strings.h>
 
-typedef struct {
+
+typedef struct FTP_CLIENT_INFORMATION{
 	int socket;
 	int port_number;
 	char *hostname;
@@ -22,15 +27,19 @@ typedef struct {
 	int socket_file_descriptor;
 }FTP_CLIENT_INFORMATION;
 
-FTP_CLIENT_INFORMATION construct_ftp_client_information();
-void destruct_ftp_client_information(FTP_CLIENT_INFORMATION ftp_client_information);
+FTP_CLIENT_INFORMATION *construct_ftp_client_information();
+void destruct_ftp_client_information(FTP_CLIENT_INFORMATION *ftp_client_information);
 
 int generate_port_number();
+
+int open_socket_ipv4(int *socket_file_descriptor);
+int open_socket_ipv6(int *socket_file_descriptor);
+
 
 int set_server_address_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information);
 int setup_ftp_connection_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information);
 
-int set_server_address_ipv6(FTP_CLIENT_INFORMATION ftp_client_information);
+int set_server_address_ipv6(FTP_CLIENT_INFORMATION *ftp_client_information);
 int setup_ftp_connection_ipv6(FTP_CLIENT_INFORMATION *ftp_client_information);
 
 int test_write(int socket_file_descriptor);
