@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "FTP_SERVER/ftp_server_driver.c"
+#include "FTP_SERVER/ftp_server_driver.h"
 
 int main(int argc , char *argv[])
 {
 
 	if(argc == 2){
 		
-		ftp_server_driver(argv[1]);
+		ftp_server_driver_execution(argv[1]);
 	}else{
 		printf("Please key in the file path you want to setup the FTP\n");
 		printf("Terminating program....\n");
