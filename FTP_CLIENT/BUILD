@@ -1,9 +1,10 @@
 package(default_visibility = ["//visibility:public"])
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl",  "cc_library")
 
-cc_binary(
+cc_library(
 	name = "FTP_CLIENT_DRIVER",
 	srcs = ["ftp_client_driver.c"],
+	hdrs = ["ftp_client_driver.h"],
 	deps = [":FTP_CLIENT"],
 )
 

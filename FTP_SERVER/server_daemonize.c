@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <syslog.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include "server_helper_function.h"
+
 /*
 int daemonize_server_process(){
 	

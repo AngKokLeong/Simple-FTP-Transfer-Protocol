@@ -1,11 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "ftp_server.h"
-#include "server_daemonize.c"
+#include "ftp_server_driver.h"
 
 char *initial_current_directory;
 
-void ftp_server_driver(char *current_directory){
+int ftp_server_driver_execution(char *current_directory){
 	
 	initial_current_directory = current_directory;
 	//log ftp server is currently serving this directory
@@ -18,4 +15,6 @@ void ftp_server_driver(char *current_directory){
 	//log ftp server started serving
 	start_ftp_server(initial_current_directory);
 	//log ftp server ended serving
+	//
+	return EXIT_SUCCESS;
 }
