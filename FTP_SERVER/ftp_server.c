@@ -1,22 +1,7 @@
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-
-#include <netinet/in.h>
-#include <netinet/ip.h>
-
-#include <errno.h>
-#include <netdb.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "ftp_server.h"
+#include "server_helper_function.h"
 
-int initialize_socket_ipv4(FTP_SERVER_INFORMATION *ftp_server_information){
+int initialize_socket_ipv4(){
 	
 	int socket_file_descriptor;
 	int bind_status;
@@ -24,7 +9,6 @@ int initialize_socket_ipv4(FTP_SERVER_INFORMATION *ftp_server_information){
 	int listen_status;
 	int maximum_number_of_pending_connections_for_socket_descriptor = 5;
 	socklen_t size_of_address;
-        struct sockaddr_in ipv4_socket;
 	
 	//opening stream socket
 	socket_file_descriptor = socket(PF_INET, SOCK_STREAM, 0);
@@ -35,11 +19,15 @@ int initialize_socket_ipv4(FTP_SERVER_INFORMATION *ftp_server_information){
 		exit(EXIT_FAILURE);
 	}
 
+	
 
-	ipv4_socket.sin_family = PF_INET;
-	ipv4_socket.sin_addr.s_addr = INADDR_LOOPBACK;
+	int generated_port_number = generate_random_port_number();
 
-	bind_status = bind(socket_file_descriptor, (struct sockaddr *) &ipv4_socket, sizeof(ipv4_socket));
+	ftp_server_ipv4.sin_family = PF_INET;
+	ftp_server_ipv4.sin_addr.s_addr = htonl(INADDR_ANY);
+	ftp_server_ipv4.sin_port = htons(generated_port_number); 
+
+	bind_status = bind(socket_file_descriptor, (struct sockaddr *) &ftp_server_ipv4, sizeof(ftp_server_ipv4));
 
 	if(bind_status != 0){
 		perror("binding stream socket");
@@ -48,19 +36,18 @@ int initialize_socket_ipv4(FTP_SERVER_INFORMATION *ftp_server_information){
 	}
 	//log successfully bind stream socket
 	
-	size_of_address = sizeof(ipv4_socket);
+	size_of_address = sizeof(ftp_server_ipv4);
 
-	socket_name_status = getsockname(socket_file_descriptor, (struct sockaddr *) &ipv4_socket, &size_of_address);
+	socket_name_status = getsockname(socket_file_descriptor, (struct sockaddr *) &ftp_server_ipv4, &size_of_address);
 
 	if(socket_name_status != 0){
-		
 		perror("getting socket name");
 		exit(EXIT_FAILURE);
-
 	}
 	//log successfully getting socket name	
 	
-	(void)printf("FTP Server has port #%d\n", ntohs(ipv4_socket.sin_port));
+	//(void)printf("FTP Server current ip address:%d\n", ntohl(ftp_server_ipv4.sin_addr.s_addr));
+	(void)printf("FTP Server has port #%d\n", generated_port_number);
 
 	listen_status = listen(socket_file_descriptor, maximum_number_of_pending_connections_for_socket_descriptor);
 	
@@ -69,8 +56,6 @@ int initialize_socket_ipv4(FTP_SERVER_INFORMATION *ftp_server_information){
 		exit(EXIT_FAILURE);
 	}
 	//log successfully listen the port
-	
-	ftp_server_information->ftp_server_ipv4 = ipv4_socket;
 
 	return socket_file_descriptor;
 }
@@ -81,7 +66,7 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 	int rval;
 	char claddr[INET_ADDRSTRLEN];
 
-	if((rip = inet_ntop(PF_INET, &(client.sin_addr), claddr, INET_ADDRSTRLEN)) == NULL){
+	if((rip = inet_ntop(PF_INET, &client.sin_addr, claddr, INET_ADDRSTRLEN)) == NULL){
 
 		perror("inet_ntop");
 		rip = "unknown";
@@ -120,14 +105,13 @@ void reap_zombie_processes(){
 
 int start_ftp_server(char *file_path_to_serve){
 	
-	FTP_SERVER_INFORMATION ftp_server_information;
-	
 	if(signal(SIGCHLD, reap_zombie_processes) == SIG_ERR){
+		printf("SDSDS");
 		perror("signal error");
 		exit(EXIT_FAILURE);
 	}
 
-	int socket_file_descriptor = initialize_socket_ipv4(&ftp_server_information);
+	int socket_file_descriptor = initialize_socket_ipv4();
 
 	for(;;){
 		fd_set ready;
@@ -150,7 +134,6 @@ int start_ftp_server(char *file_path_to_serve){
 			(void)printf("FTP Server: waiting for connections . . . \n");
 		}
 		
-
 	}
 
 }

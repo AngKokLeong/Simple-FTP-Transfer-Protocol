@@ -17,6 +17,6 @@ cc_library(
 
 cc_library(
 	name = "SERVER_HELPER_FUNCTION",
-	srcs = ["server_daemonize.c"],
+	srcs = ["server_daemonize.c", "generate_random_port_number.c"],
 	hdrs = ["server_helper_function.h"],
 )

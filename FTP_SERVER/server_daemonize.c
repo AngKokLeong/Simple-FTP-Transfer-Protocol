@@ -61,7 +61,7 @@ int daemonize_ftp_server_process(){
 	
 	int daemon_creation_status;
 
-	daemon_creation_status = daemon(0, 0);
+	daemon_creation_status = daemon(1, 1);
 	
 	if(daemon_creation_status == 0){
 		//write a log that daemon have been created successfully
