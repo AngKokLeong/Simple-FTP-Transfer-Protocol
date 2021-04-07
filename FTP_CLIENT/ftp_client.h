@@ -16,31 +16,33 @@
 #include <netdb.h>
 #include <strings.h>
 
-
 typedef struct FTP_CLIENT_INFORMATION{
 	int socket;
 	int port_number;
 	char *hostname;
-	struct sockaddr_in ftp_server_ipv4;
-	struct sockaddr_in6 ftp_server_ipv6;
-	struct hostent *host_information;
+	char *ip_address;
+	int ip_address_INET_NO;
 	int socket_file_descriptor;
 }FTP_CLIENT_INFORMATION;
 
-FTP_CLIENT_INFORMATION *construct_ftp_client_information();
-void destruct_ftp_client_information(FTP_CLIENT_INFORMATION *ftp_client_information);
+FTP_CLIENT_INFORMATION ftp_client_information;
+
+struct sockaddr_in ftp_client_ipv4;
+struct sockaddr_in6 ftp_client_ipv6;
+struct hostent *host_information;
+
 
 int generate_port_number();
 
-int open_socket_ipv4(int *socket_file_descriptor);
-int open_socket_ipv6(int *socket_file_descriptor);
+int open_socket_ipv4();
+int open_socket_ipv6();
 
 
-int set_server_address_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information);
-int setup_ftp_connection_ipv4(FTP_CLIENT_INFORMATION *ftp_client_information);
+int set_server_address_ipv4();
+int setup_ftp_connection_ipv4();
 
-int set_server_address_ipv6(FTP_CLIENT_INFORMATION *ftp_client_information);
-int setup_ftp_connection_ipv6(FTP_CLIENT_INFORMATION *ftp_client_information);
+int set_server_address_ipv6();
+int setup_ftp_connection_ipv6();
 
 int test_write(int socket_file_descriptor);
 void close_socket(int socket_file_descriptor);
