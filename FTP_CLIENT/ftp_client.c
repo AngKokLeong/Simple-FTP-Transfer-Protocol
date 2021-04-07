@@ -31,6 +31,9 @@ int open_socket_ipv6(){
 
 int set_server_address_ipv4(){
 	ftp_client_ipv4.sin_family = PF_INET;
+
+
+
 	if((host_information = gethostbyname(ftp_client_information.hostname)) == NULL){
 		(void) fprintf(stderr, "%s: unknown host \n", ftp_client_information.hostname);
 		exit(EXIT_FAILURE);

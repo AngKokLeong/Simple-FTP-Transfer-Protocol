@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <netdb.h>
 #include <strings.h>
+#include "ftp_client_helper_function.h"
 
 typedef struct FTP_CLIENT_INFORMATION{
 	int socket;
