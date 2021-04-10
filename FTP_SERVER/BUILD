@@ -12,7 +12,7 @@ cc_library(
 	name = "FTP_SERVER",
 	srcs = ["ftp_server.c"],
 	hdrs = ["ftp_server.h"],
-	deps = [":SERVER_HELPER_FUNCTION"],
+	deps = [":SERVER_HELPER_FUNCTION", "//PROTOCOL_COMMAND:COMMAND"],
 )
 
 cc_library(
@@ -20,3 +20,4 @@ cc_library(
 	srcs = ["server_daemonize.c", "generate_random_port_number.c"],
 	hdrs = ["server_helper_function.h"],
 )
+

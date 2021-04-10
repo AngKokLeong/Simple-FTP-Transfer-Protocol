@@ -47,7 +47,7 @@ int initialize_socket_ipv4(){
 	//log successfully getting socket name	
 	
 	//(void)printf("FTP Server current ip address:%d\n", ntohl(ftp_server_ipv4.sin_addr.s_addr));
-	(void)printf("FTP Server has port #%d\n", generated_port_number);
+	(void)printf("FTP Server has port %d\n", generated_port_number);
 
 	listen_status = listen(socket_file_descriptor, maximum_number_of_pending_connections_for_socket_descriptor);
 	
@@ -73,6 +73,8 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 		(void)printf("Client connection from %s!\n", rip);
 	}
 
+    //char * DATA = "TEST_TEST_TEST_TEST_TEST";
+
 	do {
         char buf[BUFSIZ];
         bzero(buf, sizeof(buf));
@@ -82,11 +84,25 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
         }else if(rval == 0){
             printf("Ending connection from %s.\n", rip);
         }else{
-            printf("Client sent: %s", buf);
+            //printf("Client sent: %s\n", buf);
+            //store the command
+
+
+
+            //check the data in buf
+            //call command to process the information
+            //print the data out from there
+            /*if(strcmp(buf,"HELLO") == 0){
+                if((write(file_descriptor, DATA, BUFSIZ)) < 0){
+                    perror("writing on stream socket");
+                    exit(EXIT_FAILURE);
+                }
+            }*/
         }
 
-
 	}while(rval != 0);
+
+
 
     (void)close(file_descriptor);
     exit(EXIT_SUCCESS);
@@ -113,39 +129,39 @@ void handle_ipv4_socket(int socket_file_descriptor){
 		handle_ipv4_connection(file_descriptor, ftp_client);
 	}
 }
-
+void reap() {
+    wait(NULL);
+}
 void reap_zombie_processes(){
-	wait(NULL);
+    if(signal(SIGCHLD, reap_zombie_processes) == SIG_ERR){
+        printf("SDSDS");
+        perror("signal error");
+        exit(EXIT_FAILURE);
+    }
 }
 
-
 int start_ftp_server(char *file_path_to_serve){
-	
-	if(signal(SIGCHLD, reap_zombie_processes) == SIG_ERR){
-		printf("SDSDS");
-		perror("signal error");
-		exit(EXIT_FAILURE);
-	}
 
-	int socket_file_descriptor = initialize_socket_ipv4();
+	reap_zombie_processes();
+
+	ftp_server_information.socket_file_descriptor = initialize_socket_ipv4();
 
 	for(;;){
-		fd_set ready;
-		struct timeval to;
+	    struct timeval to;
 
-		FD_ZERO(&ready);
-		FD_SET(socket_file_descriptor, &ready);
+        FD_ZERO(&ftp_server_information.file_descriptor_read);
+		FD_SET(ftp_server_information.socket_file_descriptor, &ftp_server_information.file_descriptor_read);
 		to.tv_sec = 5;
 		to.tv_usec = 0;
 
-		if(select(socket_file_descriptor + 1, &ready, 0, 0, &to) < 0){
+		if(select(ftp_server_information.socket_file_descriptor + 1, &ftp_server_information.file_descriptor_read, 0, 0, &to) < 0){
 			if(errno != EINTR)
 			       perror("error occur in select");
 			continue;	
 		}
 
-		if(FD_ISSET(socket_file_descriptor, &ready)){
-			handle_ipv4_socket(socket_file_descriptor);
+		if(FD_ISSET(ftp_server_information.socket_file_descriptor, &ftp_server_information.file_descriptor_read)){
+			handle_ipv4_socket(ftp_server_information.socket_file_descriptor);
 		}else{
 			(void)printf("FTP Server: waiting for connections . . . \n");
 		}
