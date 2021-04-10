@@ -27,7 +27,7 @@ char** string_splitter(char *string_to_be_split, const char delimiter){
         tmp++;
     }
 
-    count += last_comma < (string_to_be_split + strlen(string_to_be_split) - 1);
+    count += last_delimiter < (string_to_be_split + strlen(string_to_be_split) - 1);
 
     count++;
 
