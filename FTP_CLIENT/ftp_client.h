@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <netdb.h>
 #include <strings.h>
+#include <stdbool.h>
 #include "ftp_client_helper_function.h"
 
 typedef struct FTP_CLIENT_INFORMATION{
@@ -22,6 +23,8 @@ typedef struct FTP_CLIENT_INFORMATION{
 	int port_number;
 	char *hostname;
 	char *ip_address;
+	bool ip_address_used;
+	bool hostname_used;
 	int ip_address_INET_NO;
 	int socket_file_descriptor;
 }FTP_CLIENT_INFORMATION;
@@ -35,8 +38,8 @@ struct hostent *host_information;
 
 int generate_port_number();
 
-int open_socket_ipv4();
-int open_socket_ipv6();
+void open_socket_ipv4();
+void open_socket_ipv6();
 
 
 int set_server_address_ipv4();

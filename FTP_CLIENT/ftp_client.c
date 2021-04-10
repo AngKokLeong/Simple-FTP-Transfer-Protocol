@@ -6,43 +6,49 @@ int generate_port_number(){
 	return port_number;
 }
 
-int open_socket_ipv4(){
-	int socket_file_descriptor_container = 0;
+void open_socket_ipv4(){
+	ftp_client_information.socket_file_descriptor = 0;
 	
-	if((socket_file_descriptor_container = socket(PF_INET, SOCK_STREAM, 0)) < 0){
+	if((ftp_client_information.socket_file_descriptor = socket(PF_INET, SOCK_STREAM, 0)) < 0){
 		perror("problem connection stream socket ipv4");
 		exit(EXIT_FAILURE);
 	}
-
-	return socket_file_descriptor_container;
+	//log successfully created an ipv4 socket
 }
 
-int open_socket_ipv6(){
-	int socket_file_descriptor_container = 0;
+void open_socket_ipv6(){
+	ftp_client_information.socket_file_descriptor = 0;
 	
-	if((socket_file_descriptor_container = socket(PF_INET6, SOCK_STREAM, 0)) < 0) {
+	if((ftp_client_information.socket_file_descriptor = socket(PF_INET6, SOCK_STREAM, 0)) < 0) {
 		perror("problem connecting stream socket ipv6");
 		exit(EXIT_FAILURE);
 	}
 	
 	//log successfully created a socket 
-	return socket_file_descriptor_container;
 }
 
 int set_server_address_ipv4(){
 	ftp_client_ipv4.sin_family = PF_INET;
 
+	if(ftp_client_information.ip_address_used == true && ftp_client_information.hostname_used == false){
+		bzero((char *) ftp_client_ipv4, sizeof(ftp_client_ipv4));
+        ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
+        ftp_client_ipv4.sin_addr.s_addr = htonl(convert_ip_address_to_integer(ftp_client_information.ip_address));
 
+        printf("IP Address: %d", ftp_client_ipv4.sin_addr.s_addr);
+        //log the server address have been set properly for this client
+	}else if(ftp_client_information.ip_address_used == false && ftp_client_information.hostname_used == true){
+        if((host_information = gethostbyname(ftp_client_information.hostname)) == NULL){
+            (void) fprintf(stderr, "%s: unknown host \n", ftp_client_information.hostname);
+            exit(EXIT_FAILURE);
+        }
 
-	if((host_information = gethostbyname(ftp_client_information.hostname)) == NULL){
-		(void) fprintf(stderr, "%s: unknown host \n", ftp_client_information.hostname);
-		exit(EXIT_FAILURE);
-	}
-
-	bcopy(host_information->h_addr, &ftp_client_ipv4.sin_addr, host_information->h_length);
-	ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
-	printf("%d", ftp_client_ipv4.sin_addr.s_addr);	
-	//log the server address have been set properly for this client
+        bcopy(host_information->h_addr, &ftp_client_ipv4.sin_addr, host_information->h_length);
+        ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
+        printf("IP Address used after converted from hostname: %d", ftp_client_ipv4.sin_addr.s_addr);
+        printf("Current hostname used: %s", ftp_client_information.hostname);
+        //log the server address have been set properly for this client
+    }
 	return EXIT_SUCCESS;
 }
 
