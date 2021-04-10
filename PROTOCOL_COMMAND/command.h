@@ -1,6 +1,8 @@
 //
 // Created by angkokleong on 4/10/21.
 //
+#include "SERVER_COMMAND/server_command.h"
+#include "CLIENT_COMMAND/client_command.h"
 
 #ifndef ICT374_ASSIGNMENT02_COMMAND_H
 #define ICT374_ASSIGNMENT02_COMMAND_H
@@ -10,15 +12,14 @@
 
 typedef struct MESSAGE_STRUCTURE{
     char current_response_code;
-    char *unix_command_to_execute_options;
-    char *unix_command_to_execute;
     char *command_option;
     char *command;
+    char *result;
 }MESSAGE_STRUCTURE;
 
 MESSAGE_STRUCTURE message_structure;
 
-char* PROCESS_MESSAGE();
+void PROCESS_MESSAGE();
 
 //used in Ftp client and server program
 void SEND_MESSAGE();

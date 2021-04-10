@@ -19,9 +19,22 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
 	set_server_address_ipv4();
 	setup_ftp_connection_ipv4();
 
-	//write function
-    test_write(ftp_client_information.socket_file_descriptor);
+    char user_input[BUFSIZ];
 
+    while(strcmp(user_input, "quit") != 0){
+        printf("Key in a command: ");
+        scanf("%s", user_input);
+        //write function
+
+        //select(ftp_client_information.)
+
+
+        test_write(ftp_client_information.socket_file_descriptor, user_input);
+        test_read(ftp_client_information.socket_file_descriptor);
+    }
+
+    //until i type quit
+    //then close socket
 	close_socket(ftp_client_information.socket_file_descriptor);
 	//printf("TEST VALUE: %s", ip_address_or_hostname);	
 	return EXIT_SUCCESS;	
