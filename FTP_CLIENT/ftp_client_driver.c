@@ -15,11 +15,12 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
 		ftp_client_information.hostname_used = true;
 	}	
 	
-	ftp_client_information.socket_file_descriptor = open_socket_ipv4();
+	open_socket_ipv4();
 	set_server_address_ipv4();
 	setup_ftp_connection_ipv4();
 
 	//write function
+    test_write(ftp_client_information.socket_file_descriptor);
 
 	close_socket(ftp_client_information.socket_file_descriptor);
 	//printf("TEST VALUE: %s", ip_address_or_hostname);	

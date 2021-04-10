@@ -31,7 +31,7 @@ int set_server_address_ipv4(){
 	ftp_client_ipv4.sin_family = PF_INET;
 
 	if(ftp_client_information.ip_address_used == true && ftp_client_information.hostname_used == false){
-		bzero((char *) ftp_client_ipv4, sizeof(ftp_client_ipv4));
+
         ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
         ftp_client_ipv4.sin_addr.s_addr = htonl(convert_ip_address_to_integer(ftp_client_information.ip_address));
 
@@ -92,18 +92,17 @@ int setup_ftp_connection_ipv6(){
 }
 
 int test_write(int socket_file_descriptor){
-	char * DATA = "TESTING .... TESTING";
+	char * DATA = "TESTING_ABCS";
 
 	if((write(socket_file_descriptor, DATA, sizeof(DATA))) < 0){
 		perror("writing on stream socket");
-
+        exit(EXIT_FAILURE);
 	}
 	
 	return EXIT_SUCCESS;
 }
 
 void close_socket(int socket_file_descriptor){
-
 	(void)close(socket_file_descriptor);
 	//log close socket
 }	

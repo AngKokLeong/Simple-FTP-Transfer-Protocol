@@ -31,6 +31,7 @@ typedef struct FTP_CLIENT_INFORMATION{
 
 FTP_CLIENT_INFORMATION ftp_client_information;
 
+
 struct sockaddr_in ftp_client_ipv4;
 struct sockaddr_in6 ftp_client_ipv6;
 struct hostent *host_information;
