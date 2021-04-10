@@ -67,13 +67,29 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 	char claddr[INET_ADDRSTRLEN];
 
 	if((rip = inet_ntop(PF_INET, &client.sin_addr, claddr, INET_ADDRSTRLEN)) == NULL){
-
 		perror("inet_ntop");
 		rip = "unknown";
-	}else{
+	}else {
 		(void)printf("Client connection from %s!\n", rip);
 	}
 
+	do {
+        char buf[BUFSIZ];
+        bzero(buf, sizeof(buf));
+
+        if((rval = read(file_descriptor, buf, BUFSIZ)) < 0){
+            perror("reading stream message");
+        }else if(rval == 0){
+            printf("Ending connection from %s.\n", rip);
+        }else{
+            printf("Client sent: %s", buf);
+        }
+
+
+	}while(rval != 0);
+
+    (void)close(file_descriptor);
+    exit(EXIT_SUCCESS);
 }
 
 void handle_ipv4_socket(int socket_file_descriptor){
