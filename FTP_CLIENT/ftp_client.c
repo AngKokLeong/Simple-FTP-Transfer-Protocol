@@ -8,7 +8,7 @@ int generate_port_number(){
 
 void open_socket_ipv4(){
 	ftp_client_information.socket_file_descriptor = 0;
-	
+
 	if((ftp_client_information.socket_file_descriptor = socket(PF_INET, SOCK_STREAM, 0)) < 0){
 		perror("problem connection stream socket ipv4");
 		exit(EXIT_FAILURE);
@@ -23,7 +23,7 @@ void open_socket_ipv6(){
 		perror("problem connecting stream socket ipv6");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	//log successfully created a socket 
 }
 
@@ -35,7 +35,7 @@ int set_server_address_ipv4(){
         ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
         ftp_client_ipv4.sin_addr.s_addr = htonl(convert_ip_address_to_integer(ftp_client_information.ip_address));
 
-        printf("IP Address: %d", ftp_client_ipv4.sin_addr.s_addr);
+        printf("IP Address: %d\n", ftp_client_ipv4.sin_addr.s_addr);
         //log the server address have been set properly for this client
 	}else if(ftp_client_information.ip_address_used == false && ftp_client_information.hostname_used == true){
         if((host_information = gethostbyname(ftp_client_information.hostname)) == NULL){
@@ -45,8 +45,8 @@ int set_server_address_ipv4(){
 
         bcopy(host_information->h_addr, &ftp_client_ipv4.sin_addr, host_information->h_length);
         ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
-        printf("IP Address used after converted from hostname: %d", ftp_client_ipv4.sin_addr.s_addr);
-        printf("Current hostname used: %s", ftp_client_information.hostname);
+        printf("IP Address used after converted from hostname: %d\n", ftp_client_ipv4.sin_addr.s_addr);
+        printf("Current hostname used: %s\n", ftp_client_information.hostname);
         //log the server address have been set properly for this client
     }
 	return EXIT_SUCCESS;
@@ -91,8 +91,8 @@ int setup_ftp_connection_ipv6(){
 	return EXIT_SUCCESS;
 }
 
-int test_write(int socket_file_descriptor){
-	char * DATA = "TESTING_ABCS";
+int test_write(int socket_file_descriptor, char *user_input){
+	char *DATA = user_input;
 
 	if((write(socket_file_descriptor, DATA, sizeof(DATA))) < 0){
 		perror("writing on stream socket");
@@ -100,6 +100,21 @@ int test_write(int socket_file_descriptor){
 	}
 	
 	return EXIT_SUCCESS;
+}
+
+
+int test_read(int socket_file_descriptor){
+    int rval;
+    char buf[BUFSIZ];
+    if((rval = read(socket_file_descriptor, buf, BUFSIZ)) < 0){
+        perror("reading stream message");
+    }else if(rval == 0){
+        printf("Ending connection from server\n");
+    }else {
+        printf("Server sent: %s\n", buf);
+    }
+
+    return EXIT_SUCCESS;
 }
 
 void close_socket(int socket_file_descriptor){

@@ -16,6 +16,7 @@
 #include <netdb.h>
 #include <strings.h>
 #include <stdbool.h>
+#include <sys/sendfile.h>
 #include "ftp_client_helper_function.h"
 
 typedef struct FTP_CLIENT_INFORMATION{
@@ -26,7 +27,9 @@ typedef struct FTP_CLIENT_INFORMATION{
 	bool ip_address_used;
 	bool hostname_used;
 	int ip_address_INET_NO;
-	int socket_file_descriptor;
+    int socket_file_descriptor;
+	int file_descriptor_read;
+	int file_descriptor_write;
 }FTP_CLIENT_INFORMATION;
 
 FTP_CLIENT_INFORMATION ftp_client_information;
@@ -49,5 +52,9 @@ int setup_ftp_connection_ipv4();
 int set_server_address_ipv6();
 int setup_ftp_connection_ipv6();
 
-int test_write(int socket_file_descriptor);
+
+
+
+int test_write(int socket_file_descriptor, char *user_input);
+int test_read(int socket_file_descriptor);
 void close_socket(int socket_file_descriptor);

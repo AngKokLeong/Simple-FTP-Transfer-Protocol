@@ -1,7 +1,0 @@
-
-
-
-
-//function for each command
-//
-//
