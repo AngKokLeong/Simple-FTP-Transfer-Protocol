@@ -1,3 +1,6 @@
+#ifndef ICT374_ASSIGNMENT02_FTP_SERVER_H
+#define ICT374_ASSIGNMENT02_FTP_SERVER_H
+
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -13,10 +16,14 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
 #include <string.h>
+#include <strings.h>
+
+#include <stdbool.h>
 #include <sys/sendfile.h>
+
 #include "../PROTOCOL_COMMAND/command.h"
+
 
 typedef struct{
 	int socket;
@@ -24,11 +31,15 @@ typedef struct{
 	int socket_file_descriptor;
 	fd_set file_descriptor_write;
     fd_set file_descriptor_read;
+    pid_t current_server_pid;
+    char *initial_current_directory;
 }FTP_SERVER_INFORMATION;
 
 FTP_SERVER_INFORMATION ftp_server_information;
 struct sockaddr_in ftp_server_ipv4;
 struct sockaddr_in6 ftp_server_ipv6;
+
+#endif
 
 int initialize_socket_ipv6();
 int initialize_socket_ipv4();
@@ -45,3 +56,5 @@ void reap();
 void reap_zombie_processes();
 
 int start_ftp_server(char *file_path_to_serve);
+
+void print_ftp_server_information_to_client(int file_descriptor);

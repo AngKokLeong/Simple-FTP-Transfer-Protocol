@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <sys/sendfile.h>
 #include "ftp_client_helper_function.h"
+#include "../PROTOCOL_COMMAND/command.h"
 
 typedef struct FTP_CLIENT_INFORMATION{
 	int socket;
@@ -28,8 +29,8 @@ typedef struct FTP_CLIENT_INFORMATION{
 	bool hostname_used;
 	int ip_address_INET_NO;
     int socket_file_descriptor;
-	int file_descriptor_read;
-	int file_descriptor_write;
+	fd_set file_descriptor_read;
+	fd_set file_descriptor_write;
 }FTP_CLIENT_INFORMATION;
 
 FTP_CLIENT_INFORMATION ftp_client_information;
@@ -52,9 +53,6 @@ int setup_ftp_connection_ipv4();
 int set_server_address_ipv6();
 int setup_ftp_connection_ipv6();
 
-
-
-
-int test_write(int socket_file_descriptor, char *user_input);
-int test_read(int socket_file_descriptor);
+int write_to_server(int socket_file_descriptor, DATA_PACKET *data_packet_instance);
+int read_from_server(int socket_file_descriptor, DATA_PACKET *data_packet_instance);
 void close_socket(int socket_file_descriptor);

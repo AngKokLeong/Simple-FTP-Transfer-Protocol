@@ -1,6 +1,29 @@
 #include "ftp_server.h"
 #include "server_helper_function.h"
 
+
+char ftp_server_response_code[7][1] = {
+        "+", //SUCCESS RESPONSE CODE
+        "-", //FAILURE RESPONSE CODE
+        "=", //PENDING PROCESSING RESPONSE CODE
+        "!", // SEND TO SERVER RESPONSE CODE
+        "@", // SEND TO CLIENT RESPONSE CODE
+        "#", // SEND FILE TO CLIENT RESPONSE CODE
+        "%" // SEND FILE TO SERVER RESPONSE CODE
+};
+
+char *ftp_server_command_type[2] = {
+        "CLIENT",
+        "SERVER"
+};
+char *ftp_server_server_command_array[5] = {
+        "lpwd",
+        "ldir",
+        "lcd",
+        "get",
+        "put"
+};
+
 int initialize_socket_ipv4(){
 	
 	int socket_file_descriptor;
@@ -18,8 +41,6 @@ int initialize_socket_ipv4(){
 		//log error opening stream socket
 		exit(EXIT_FAILURE);
 	}
-
-	
 
 	int generated_port_number = generate_random_port_number();
 
@@ -47,7 +68,7 @@ int initialize_socket_ipv4(){
 	//log successfully getting socket name	
 	
 	//(void)printf("FTP Server current ip address:%d\n", ntohl(ftp_server_ipv4.sin_addr.s_addr));
-	(void)printf("FTP Server has port %d\n", generated_port_number);
+	//(void)printf("FTP Server has port %d\n", generated_port_number);
 
 	listen_status = listen(socket_file_descriptor, maximum_number_of_pending_connections_for_socket_descriptor);
 	
@@ -60,8 +81,31 @@ int initialize_socket_ipv4(){
 	return socket_file_descriptor;
 }
 
+void print_server_information_to_client(int file_descriptor){
+    char *information = "Server Information\n======================\n";
+    if((write(file_descriptor, information, BUFSIZ)) < 0){
+        perror("writing on stream socket");
+        exit(EXIT_FAILURE);
+    }
+    information = "";
+    sprintf(information, "Current directory in Server: %s\n", ftp_server_information.initial_current_directory);
+    if((write(file_descriptor, information, BUFSIZ)) < 0){
+        perror("writing on stream socket");
+        exit(EXIT_FAILURE);
+    }
+
+    information = "";
+    sprintf(information, "Current FTP Server Daemon Process ID: %d\n", ftp_server_information.current_server_pid);
+    if((write(file_descriptor, information, BUFSIZ)) < 0){
+        perror("writing on stream socket");
+        exit(EXIT_FAILURE);
+    }
+
+}
+
 void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
-	
+
+    bool print_initial_server_message = false;
 	const char *rip;
 	int rval;
 	char claddr[INET_ADDRSTRLEN];
@@ -73,36 +117,64 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 		(void)printf("Client connection from %s!\n", rip);
 	}
 
-    //char * DATA = "TEST_TEST_TEST_TEST_TEST";
-
 	do {
-        char buf[BUFSIZ];
-        bzero(buf, sizeof(buf));
-
-        if((rval = read(file_descriptor, buf, BUFSIZ)) < 0){
+        DATA_PACKET data_packet_instance;
+        if((rval = read(file_descriptor, &data_packet_instance, sizeof(DATA_PACKET))) < 0){
             perror("reading stream message");
         }else if(rval == 0){
             printf("Ending connection from %s.\n", rip);
         }else{
-            //printf("Client sent: %s\n", buf);
-            //store the command
+            if(!print_initial_server_message){
 
+                //call the command to change the current working directory to the initial working directory
 
+                data_packet_instance.command = "cd";
+                data_packet_instance.command_argument[0] = "cd";
+                data_packet_instance.command_argument[1] = ftp_server_information.initial_current_directory;
+                data_packet_instance.command_argument[2] = "NULL";
 
-            //check the data in buf
-            //call command to process the information
-            //print the data out from there
-            /*if(strcmp(buf,"HELLO") == 0){
-                if((write(file_descriptor, DATA, BUFSIZ)) < 0){
+                data_packet_instance.data = "";
+                data_packet_instance.response_code = "+";
+                //change the current directory to a specific path
+                EXECUTE_SERVER_COMMAND(data_packet_instance);
+
+                if(strcmp(data_packet_instance.response_code, "+") != 0){
+                    if(write(ftp_server_information.socket_file_descriptor, data_packet_instance, sizeof(DATA_PACKET)) < 0){
+                        perror("Write socket error");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                print_initial_server_message = true;
+            }
+
+            print_server_information_to_client(file_descriptor);
+            PROCESS_DATA_PACKET(&data_packet_instance);
+
+            if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0) {
+                EXECUTE_SERVER_COMMAND(&data_packet_instance);
+            }
+
+            if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_FILE_TO_CLIENT_RESPONSE_CODE]) == 0) {
+
+                if((write(file_descriptor, &data_packet_instance, sizeof(DATA_PACKET))) < 0){
                     perror("writing on stream socket");
                     exit(EXIT_FAILURE);
                 }
-            }*/
+
+            }else if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_TO_CLIENT_RESPONSE_CODE]) == 0) {
+                //send server command result back to client
+                if((write(file_descriptor, &data_packet_instance, sizeof(DATA_PACKET))) < 0){
+                    perror("writing on stream socket");
+                    exit(EXIT_FAILURE);
+                }
+
+            }
+
+
+
         }
 
 	}while(rval != 0);
-
-
 
     (void)close(file_descriptor);
     exit(EXIT_SUCCESS);
@@ -145,6 +217,8 @@ int start_ftp_server(char *file_path_to_serve){
 	reap_zombie_processes();
 
 	ftp_server_information.socket_file_descriptor = initialize_socket_ipv4();
+    ftp_server_information.initial_current_directory = file_path_to_serve;
+
 
 	for(;;){
 	    struct timeval to;
@@ -169,3 +243,4 @@ int start_ftp_server(char *file_path_to_serve){
 	}
 
 }
+
