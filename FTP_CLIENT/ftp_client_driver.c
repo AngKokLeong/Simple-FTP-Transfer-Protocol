@@ -75,14 +75,14 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
         }
 
         data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
-
+        char BUFFER[BUFSIZ] = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
         if(strcmp(data_packet_instance.command_type, ftp_client_command_type[CLIENT]) == 0){
             EXECUTE_COMMAND_IN_CLIENT(data_packet_instance);
 
         }else if(strcmp(data_packet_instance.command_type, ftp_client_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_client_response_code[SEND_TO_SERVER_RESPONSE_CODE]) == 0) {
             printf("%s Sending command %s to FTP Server.... \n", data_packet_instance.response_code, data_packet_instance.command);
             //send data to server
-            write_to_server(ftp_client_information.socket_file_descriptor, &data_packet_instance);
+            write_to_server(ftp_client_information.socket_file_descriptor, data_packet_instance);
         }else if(strcmp(data_packet_instance.command_type, ftp_client_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_client_response_code[SEND_FILE_TO_SERVER_RESPONSE_CODE]) == 0) {
 
         }

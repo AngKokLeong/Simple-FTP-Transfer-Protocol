@@ -110,6 +110,8 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 	int rval;
 	char claddr[INET_ADDRSTRLEN];
 
+	DATA_PACKET data_packet_instance;
+
 	if((rip = inet_ntop(PF_INET, &client.sin_addr, claddr, INET_ADDRSTRLEN)) == NULL){
 		perror("inet_ntop");
 		rip = "unknown";
@@ -118,8 +120,8 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 	}
 
 	do {
-        DATA_PACKET data_packet_instance;
-        if((rval = read(file_descriptor, &data_packet_instance, sizeof(DATA_PACKET))) < 0){
+        char BUFFER[BUFSIZ];
+        if((rval = read(file_descriptor, BUFFER, BUFSIZ)) < 0){
             perror("reading stream message");
         }else if(rval == 0){
             printf("Ending connection from %s.\n", rip);
@@ -138,17 +140,15 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
                 //change the current directory to a specific path
                 EXECUTE_SERVER_COMMAND(data_packet_instance);
 
-                if(strcmp(data_packet_instance.response_code, "+") != 0){
-                    if(write(ftp_server_information.socket_file_descriptor, data_packet_instance, sizeof(DATA_PACKET)) < 0){
-                        perror("Write socket error");
-                        exit(EXIT_FAILURE);
-                    }
-                }
                 print_initial_server_message = true;
             }
 
+
+
+
             print_server_information_to_client(file_descriptor);
-            PROCESS_DATA_PACKET(&data_packet_instance);
+
+            //data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
 
             if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0) {
                 EXECUTE_SERVER_COMMAND(&data_packet_instance);

@@ -30,7 +30,14 @@ char *server_command_array[5] = {
         "put"
 };
 
+DATA_PACKET PROCESS_MESSAGE_BUFFER_TO_DATA_PACKET(char *BUFFER){
+    for(int i=0; i < BUFSIZ; i++){
 
+    }
+
+
+
+}
 
 DATA_PACKET PROCESS_DATA_PACKET(DATA_PACKET data_packet_instance){
 
@@ -155,4 +162,56 @@ DATA_PACKET RECV_FILE_FROM_CLIENT(DATA_PACKET data_packet_instance){
 DATA_PACKET RECV_FILE_FROM_SERVER(DATA_PACKET data_packet_instance) {
     //use recv()
     return data_packet_instance;
+}
+
+char[] PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance){
+    char BUFFER[BUFSIZ];
+    //Response Code ID - Command Type ID - Command ID - Command Argument with delimiter - Data
+
+    for(int i=0; i < RESPONSE_CODE_SIZE; i++){
+        if(strcmp(data_packet_instance.response_code, response_code[i]) == 0){
+            char index[2];
+            sprintf(index, "%d", i);
+            strcat(BUFFER, index);
+        }
+    }
+
+    strcat(BUFFER, "-");
+
+    if(strcmp(data_packet_instance.command_type, command_type[0]) == 0){
+        strcat(BUFFER, "0");
+
+        strcat(BUFFER, "-");
+        for(int i=0; i<CLIENT_COMMAND_ARRAY_SIZE; i++){
+            if(strcmp(data_packet_instance.command, client_command_array[i]) == 0){
+                char index[2];
+                sprintf(index, "%d", i);
+                strcat(BUFFER, index);
+            }
+        }
+    }else if(strcmp(data_packet_instance.command_type, command_type[1]) == 0){
+        strcat(BUFFER, "1");
+
+        strcat(BUFFER, "-");
+
+        for(int i=0; i<SERVER_COMMAND_ARRAY_SIZE; i++){
+           if(strcmp(data_packet_instance.command, server_command_array[i]) == 0) {
+                char index[2];
+                sprintf(index, "%d", i);
+                strcat(BUFFER, index);
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    return BUFFER[];
 }
