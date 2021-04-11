@@ -92,11 +92,7 @@ int setup_ftp_connection_ipv6(){
 }
 
 
-int write_to_server(int socket_file_descriptor, DATA_PACKET *data_packet_instance){
-    char BUFFER[BUFSIZ];
-    //process the buffer here
-
-
+int write_to_server(int socket_file_descriptor, char BUFFER[]){
     if((write(socket_file_descriptor, BUFFER, BUFSIZ)) < 0){
         perror("writing on stream socket");
         exit(EXIT_FAILURE);
@@ -117,8 +113,9 @@ int read_from_server(int socket_file_descriptor, DATA_PACKET *data_packet_instan
         printf("Ending connection from server\n");
     }else {
         printf("%s\n", BUFFER);
-
     }
+
+    //processing to DATA_PACKET
 
     return EXIT_SUCCESS;
 }
