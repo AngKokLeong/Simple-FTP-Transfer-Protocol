@@ -1,36 +1,63 @@
 //
 // Created by angkokleong on 4/10/21.
 //
-#include "SERVER_COMMAND/server_command.h"
-#include "CLIENT_COMMAND/client_command.h"
-
 #ifndef ICT374_ASSIGNMENT02_COMMAND_H
 #define ICT374_ASSIGNMENT02_COMMAND_H
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
-typedef struct MESSAGE_STRUCTURE{
-    char current_response_code;
-    char *command_option;
+
+#define die(e) do { fprintf(stderr, "%s\n", e); exit(EXIT_FAILURE); } while (0);
+
+typedef struct{
+    char *response_code;
+    char *data;
+    char *command_argument[255];
     char *command;
-    char *result;
-}MESSAGE_STRUCTURE;
+    char *command_type;
+}DATA_PACKET;
 
-MESSAGE_STRUCTURE message_structure;
+#define SERVER 1
+#define CLIENT 0
 
-void PROCESS_MESSAGE();
+#define SUCCESS_RESPONSE_CODE 0
+#define FAILURE_RESPONSE_CODE 1
+#define PENDING_RESPONSE_CODE 2
+#define SEND_TO_SERVER_RESPONSE_CODE 3
+#define SEND_TO_CLIENT_RESPONSE_CODE 4
+#define SEND_FILE_TO_CLIENT_RESPONSE_CODE 5
+#define SEND_FILE_TO_SERVER_RESPONSE_CODE 6
 
-//used in Ftp client and server program
-void SEND_MESSAGE();
-void RECEIVE_MESSAGE();
+#define SERVER_COMMAND_ARRAY_SIZE 5
+#define SERVER_COMMAND_PWD 0
+#define SERVER_COMMAND_DIR 1
+#define SERVER_COMMAND_CD 2
+#define SERVER_COMMAND_GET 3
+#define SERVER_COMMAND_PUT 4
 
-void EXECUTE_COMMAND();
-
-
-
-
-
+#define CLIENT_COMMAND_ARRAY_SIZE 4
+#define CLIENT_COMMAND_PWD 0
+#define CLIENT_COMMAND_DIR 1
+#define CLIENT_COMMAND_CD 2
+#define CLIENT_COMMAND_QUIT 3
 
 
 #endif //ICT374_ASSIGNMENT02_COMMAND_H
+
+DATA_PACKET PROCESS_DATA_PACKET(DATA_PACKET data_packet_instance);
+DATA_PACKET PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance);
+void PRINT_WRONG_COMMAND_ERROR_MESSAGE();
+
+
+DATA_PACKET SEND_FILE_TO_CLIENT(DATA_PACKET data_packet_instance);
+DATA_PACKET SEND_FILE_TO_SERVER(DATA_PACKET data_packet_instance);
+DATA_PACKET RECV_FILE_FROM_CLIENT(DATA_PACKET data_packet_instance);
+DATA_PACKET RECV_FILE_FROM_SERVER(DATA_PACKET data_packet_instance);
+
+DATA_PACKET EXECUTE_SERVER_COMMAND(DATA_PACKET data_packet_instance);
+DATA_PACKET EXECUTE_COMMAND_IN_CLIENT(DATA_PACKET data_packet_instance);

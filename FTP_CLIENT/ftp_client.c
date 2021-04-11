@@ -35,7 +35,7 @@ int set_server_address_ipv4(){
         ftp_client_ipv4.sin_port = htons(ftp_client_information.port_number);
         ftp_client_ipv4.sin_addr.s_addr = htonl(convert_ip_address_to_integer(ftp_client_information.ip_address));
 
-        printf("IP Address: %d\n", ftp_client_ipv4.sin_addr.s_addr);
+        printf("IP Address: %s\n", ftp_client_information.ip_address);
         //log the server address have been set properly for this client
 	}else if(ftp_client_information.ip_address_used == false && ftp_client_information.hostname_used == true){
         if((host_information = gethostbyname(ftp_client_information.hostname)) == NULL){
@@ -91,27 +91,33 @@ int setup_ftp_connection_ipv6(){
 	return EXIT_SUCCESS;
 }
 
-int test_write(int socket_file_descriptor, char *user_input){
-	char *DATA = user_input;
 
-	if((write(socket_file_descriptor, DATA, sizeof(DATA))) < 0){
-		perror("writing on stream socket");
+int write_to_server(int socket_file_descriptor, DATA_PACKET *data_packet_instance){
+    char BUFFER[BUFSIZ];
+    //process the buffer here
+
+
+    if((write(socket_file_descriptor, BUFFER, BUFSIZ)) < 0){
+        perror("writing on stream socket");
         exit(EXIT_FAILURE);
-	}
-	
+    }
+
 	return EXIT_SUCCESS;
 }
 
 
-int test_read(int socket_file_descriptor){
+int read_from_server(int socket_file_descriptor, DATA_PACKET *data_packet_instance){
+    //read data from server
     int rval;
-    char buf[BUFSIZ];
-    if((rval = read(socket_file_descriptor, buf, BUFSIZ)) < 0){
+    char BUFFER[BUFSIZ];
+
+    if((rval = read(ftp_client_information.socket_file_descriptor, BUFFER, BUFSIZ)) < 0){
         perror("reading stream message");
     }else if(rval == 0){
         printf("Ending connection from server\n");
     }else {
-        printf("Server sent: %s\n", buf);
+        printf("%s\n", BUFFER);
+
     }
 
     return EXIT_SUCCESS;

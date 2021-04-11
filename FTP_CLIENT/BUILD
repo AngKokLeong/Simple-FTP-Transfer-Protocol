@@ -12,7 +12,7 @@ cc_library(
 	name = "FTP_CLIENT",
 	srcs = ["ftp_client.c"],
 	hdrs = ["ftp_client.h"],
-	deps = [":FTP_CLIENT_HELPER_FUNCTION"],
+	deps = [":FTP_CLIENT_HELPER_FUNCTION", "//PROTOCOL_COMMAND:COMMAND"],
 )
 
 cc_library(
