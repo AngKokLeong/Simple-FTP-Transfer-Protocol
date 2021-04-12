@@ -158,10 +158,11 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
                 data_packet_instance = EXECUTE_SERVER_COMMAND(data_packet_instance);
             }
 
+            char *result;
             //got updated data_packet_instance
             //start to process data_packet to buffer
-            BUFFER = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
-
+            result = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
+            BUFFER = result;
             if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_FILE_TO_CLIENT_RESPONSE_CODE]) == 0) {
 
 
