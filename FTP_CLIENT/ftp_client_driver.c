@@ -51,7 +51,7 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
 	setup_ftp_connection_ipv4();
 
     char user_input[BUFSIZ];
-
+    char BUFFER[BUFSIZ];
     DATA_PACKET data_packet_instance = {.command = "TEST",.command_type = "TEST" ,.response_code = "TEST", .data = "SDSD", .command_argument[0] = "TEST"};
 
     while(strcmp(user_input, "quit") != 0){
