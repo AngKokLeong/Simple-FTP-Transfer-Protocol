@@ -78,7 +78,7 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
         data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
 
         char BUFFER[BUFSIZ];
-        char *result;
+        char *result = "a";
 
         result = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
         strcpy(BUFFER,result);
