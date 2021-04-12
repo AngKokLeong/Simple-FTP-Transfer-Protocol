@@ -144,7 +144,6 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
                 print_initial_server_message = true;
             }
 
-
             print_server_information_to_client(file_descriptor);
 
             //something to convert buffer to DATA_PACKET
@@ -174,16 +173,12 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
             }else if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_TO_CLIENT_RESPONSE_CODE]) == 0) {
                 //send server command result back to client
 
-
                 if((write(file_descriptor, BUFFER, BUFSIZ)) < 0){
                     perror("writing on stream socket");
                     exit(EXIT_FAILURE);
                 }
 
             }
-
-
-
         }
 
 	}while(rval != 0);
