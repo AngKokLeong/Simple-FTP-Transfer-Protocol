@@ -110,7 +110,7 @@ DATA_PACKET PRINT_WRONG_COMMAND_ERROR_MESSAGE(DATA_PACKET data_packet_instance){
     return data_packet_instance;
 }
 
-void EXECUTE_SERVER_COMMAND(DATA_PACKET *data_packet_instance){
+DATA_PACKET EXECUTE_SERVER_COMMAND(DATA_PACKET data_packet_instance){
     //run execl
     //check the command type
     //if the command is send or put
@@ -129,17 +129,17 @@ void EXECUTE_SERVER_COMMAND(DATA_PACKET *data_packet_instance){
         dup2 (link[1], STDOUT_FILENO);
         close(link[0]);
         close(link[1]);
-        execvp(data_packet_instance->command, data_packet_instance->command_argument);
+        execvp(data_packet_instance.command, data_packet_instance.command_argument);
         die("execvp");
     } else if(pid > 0) {
         close(link[1]);
         read(link[0], output, sizeof(output));
         //store output into message structure and send it back to client
-        data_packet_instance->data = output;
-        data_packet_instance->response_code = response_code[SEND_TO_CLIENT_RESPONSE_CODE];
+        data_packet_instance.data = output;
+        data_packet_instance.response_code = response_code[SEND_TO_CLIENT_RESPONSE_CODE];
         wait(NULL);
     }
-
+    return data_packet_instance;
 }
 
 DATA_PACKET EXECUTE_COMMAND_IN_CLIENT(DATA_PACKET data_packet_instance){
@@ -172,6 +172,7 @@ DATA_PACKET EXECUTE_COMMAND_IN_CLIENT(DATA_PACKET data_packet_instance){
 
 
     }
+    return data_packet_instance;
 }
 
 DATA_PACKET SEND_FILE_TO_CLIENT(DATA_PACKET data_packet_instance){
