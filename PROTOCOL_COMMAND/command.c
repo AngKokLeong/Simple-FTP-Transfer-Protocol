@@ -240,7 +240,7 @@ char* PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance){
     for(int i=0; i <= data_packet_instance.command_argument_size; i++){
         strcat(BUFFER, data_packet_instance.command_argument[i]);
         if(i != data_packet_instance.command_argument_size)
-            strcat(BUFFER, COMMAND_ARGUMENT_DELIMITER);
+            strcat(BUFFER, "|");
     }
 
 
@@ -250,5 +250,5 @@ char* PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance){
         strcat(BUFFER, data_packet_instance.data);
     }
 
-    return BUFFER[];
+    return BUFFER;
 }
