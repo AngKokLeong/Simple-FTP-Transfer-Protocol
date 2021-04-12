@@ -77,7 +77,12 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
         //line 79 determines whether a data gets send to server
         data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
 
-        char BUFFER[BUFSIZ] = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
+        char BUFFER[BUFSIZ];
+        char *result;
+
+        result = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
+        strcpy(BUFFER,result);
+
         if(strcmp(data_packet_instance.command_type, ftp_client_command_type[CLIENT]) == 0){
             EXECUTE_COMMAND_IN_CLIENT(data_packet_instance);
         }else if(strcmp(data_packet_instance.command_type, ftp_client_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_client_response_code[SEND_TO_SERVER_RESPONSE_CODE]) == 0) {

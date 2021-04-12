@@ -102,7 +102,7 @@ int write_to_server(int socket_file_descriptor, char BUFFER[]){
 }
 
 
-int read_from_server(int socket_file_descriptor, DATA_PACKET *data_packet_instance){
+int read_from_server(int socket_file_descriptor){
     //read data from server
     int rval;
     char BUFFER[BUFSIZ];
@@ -112,11 +112,12 @@ int read_from_server(int socket_file_descriptor, DATA_PACKET *data_packet_instan
     }else if(rval == 0){
         printf("Ending connection from server\n");
     }else {
-        printf("%s\n", BUFFER);
+        //printf("%s\n", BUFFER);
+        //processing to DATA_PACKET
+        DATA_PACKET data_packet_instance;
+        data_packet_instance = PROCESS_MESSAGE_BUFFER_TO_DATA_PACKET(BUFFER);
+        printf("%s\n", data_packet_instance.data);
     }
-
-    //processing to DATA_PACKET
-
     return EXIT_SUCCESS;
 }
 

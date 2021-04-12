@@ -120,9 +120,9 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 	}
 
 	do {
-	    char TEST[BUFSIZ];
-        char *BUFFER;
-        bzero(BUFFER, sizeof(TEST));
+
+        char BUFFER[BUFSIZ];
+        bzero(BUFFER, sizeof(BUFFER));
         if((rval = read(file_descriptor, BUFFER, BUFSIZ)) < 0){
             perror("reading stream message");
         }else if(rval == 0){

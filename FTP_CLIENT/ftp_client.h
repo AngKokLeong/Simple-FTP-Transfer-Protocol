@@ -54,5 +54,5 @@ int set_server_address_ipv6();
 int setup_ftp_connection_ipv6();
 
 int write_to_server(int socket_file_descriptor, DATA_PACKET data_packet_instance);
-int read_from_server(int socket_file_descriptor, DATA_PACKET data_packet_instance);
+int read_from_server(int socket_file_descriptor);
 void close_socket(int socket_file_descriptor);

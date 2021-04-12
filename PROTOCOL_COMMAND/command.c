@@ -251,5 +251,7 @@ char* PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance){
         strcat(BUFFER, data_packet_instance.data);
     }
 
-    return BUFFER;
+    char *result;
+    strcpy(result, BUFFER);
+    return result;
 }
