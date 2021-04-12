@@ -1,1 +1,0 @@
-CMakeLists.txt not found in /home/angkokleong/Desktop/ICT374_Assignment02 Select CMakeLists.txt
