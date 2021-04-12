@@ -121,6 +121,7 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 
 	do {
         char BUFFER[BUFSIZ];
+        bzero(buf, sizeof(buf));
         if((rval = read(file_descriptor, BUFFER, BUFSIZ)) < 0){
             perror("reading stream message");
         }else if(rval == 0){
@@ -144,26 +145,37 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
             }
 
 
-
-
             print_server_information_to_client(file_descriptor);
 
-            //data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
+            //something to convert buffer to DATA_PACKET
+            data_packet_instance = PROCESS_MESSAGE_BUFFER_TO_DATA_PACKET(BUFFER);
+            //determine which action to take after reading data packets
+            data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
 
+            //execute server commands and store the information in DATA_PACKET
             if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0) {
-                EXECUTE_SERVER_COMMAND(&data_packet_instance);
+                //get the result DATA_PACKET
+                //
+                data_packet_instance = EXECUTE_SERVER_COMMAND(data_packet_instance);
             }
+
+            //got updated data_packet_instance
+            //start to process data_packet to buffer
+            BUFFER = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
 
             if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_FILE_TO_CLIENT_RESPONSE_CODE]) == 0) {
 
-                if((write(file_descriptor, &data_packet_instance, sizeof(DATA_PACKET))) < 0){
+
+                if((write(file_descriptor, BUFFER, BUFSIZ)) < 0){
                     perror("writing on stream socket");
                     exit(EXIT_FAILURE);
                 }
 
             }else if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_TO_CLIENT_RESPONSE_CODE]) == 0) {
                 //send server command result back to client
-                if((write(file_descriptor, &data_packet_instance, sizeof(DATA_PACKET))) < 0){
+
+
+                if((write(file_descriptor, BUFFER, BUFSIZ)) < 0){
                     perror("writing on stream socket");
                     exit(EXIT_FAILURE);
                 }

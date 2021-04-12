@@ -54,7 +54,6 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
 
     DATA_PACKET data_packet_instance = {.command = "TEST",.command_type = "TEST" ,.response_code = "TEST", .data = "SDSD", .command_argument[0] = "TEST"};
 
-
     while(strcmp(user_input, "quit") != 0){
 
         printf("Key in a command: ");
@@ -74,15 +73,18 @@ int ftp_client_driver_execution(char *ip_address_or_hostname){
             counter++;
         }
 
+        data_packet_instance.command_argument_size = counter;
+        //line 79 determines whether a data gets send to server
         data_packet_instance = PROCESS_DATA_PACKET(data_packet_instance);
+
         char BUFFER[BUFSIZ] = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
         if(strcmp(data_packet_instance.command_type, ftp_client_command_type[CLIENT]) == 0){
             EXECUTE_COMMAND_IN_CLIENT(data_packet_instance);
-
         }else if(strcmp(data_packet_instance.command_type, ftp_client_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_client_response_code[SEND_TO_SERVER_RESPONSE_CODE]) == 0) {
             printf("%s Sending command %s to FTP Server.... \n", data_packet_instance.response_code, data_packet_instance.command);
             //send data to server
-            write_to_server(ftp_client_information.socket_file_descriptor, data_packet_instance);
+            BUFFER = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
+            write_to_server(ftp_client_information.socket_file_descriptor, BUFFER);
         }else if(strcmp(data_packet_instance.command_type, ftp_client_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_client_response_code[SEND_FILE_TO_SERVER_RESPONSE_CODE]) == 0) {
 
         }

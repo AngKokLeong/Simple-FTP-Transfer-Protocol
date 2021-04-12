@@ -31,12 +31,42 @@ char *server_command_array[5] = {
 };
 
 DATA_PACKET PROCESS_MESSAGE_BUFFER_TO_DATA_PACKET(char *BUFFER){
-    for(int i=0; i < BUFSIZ; i++){
+    //Response Code ID - Command Type ID - Command ID - Command Argument with delimiter - Data
 
+    DATA_PACKET data_packet_instance;
+    char *copy_buffer = BUFFER;
+
+    char *token;
+    char *rest = copy_buffer;
+
+    int counter = 1;
+
+    while((token = strtok_r(rest, "-", &rest))){
+        if(counter == 1){
+            data_packet_instance.response_code = response_code[atoi(token)];
+        }else if(counter == 2){
+            data_packet_instance.command_type = command_type[atoi(token)];
+        }else if(counter == 3){
+            if(strcmp(data_packet_instance.command_type, command_type[0]) == 0){
+                data_packet_instance.command = client_command_array[atoi(token)];
+            }else{
+                data_packet_instance.command = server_command_array[atoi(token)];
+            }
+        }else if(counter == 4){
+            char *token_command_argument;
+            char *rest_command_argument = token;
+            int command_argument_counter = 0;
+            while((token_command_argument = strtok_r(rest_command_argument, COMMAND_ARGUMENT_DELIMITER, &rest_command_argument))){
+                data_packet_instance.command_argument[command_argument_counter] = token_command_argument;
+                command_argument_counter++;
+            }
+
+        }else if(counter == 5){
+            data_packet_instance.data = token;
+        }
+        counter++;
     }
-
-
-
+    return data_packet_instance;
 }
 
 DATA_PACKET PROCESS_DATA_PACKET(DATA_PACKET data_packet_instance){
@@ -203,15 +233,22 @@ char[] PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance){
         }
     }
 
+    strcat(BUFFER, "-");
+    //get command arguments from DATA PACKET
+
+    //delimiter
+    for(int i=0; i <= data_packet_instance.command_argument_size; i++){
+        strcat(BUFFER, data_packet_instance.command_argument[i]);
+        if(i != data_packet_instance.command_argument_size)
+            strcat(BUFFER, COMMAND_ARGUMENT_DELIMITER);
+    }
 
 
+    strcat(BUFFER, "-");
 
-
-
-
-
-
-
+    if(!data_packet_instance.data){
+        strcat(BUFFER, data_packet_instance.data);
+    }
 
     return BUFFER[];
 }

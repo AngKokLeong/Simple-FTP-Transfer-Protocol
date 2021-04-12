@@ -18,6 +18,7 @@ typedef struct{
     char *response_code;
     char *data;
     char *command_argument[255];
+    int command_argument_size;
     char *command;
     char *command_type;
 }DATA_PACKET;
@@ -47,9 +48,12 @@ typedef struct{
 #define CLIENT_COMMAND_CD 2
 #define CLIENT_COMMAND_QUIT 3
 
+#define COMMAND_ARGUMENT_DELIMITER '|'
 
 #endif //ICT374_ASSIGNMENT02_COMMAND_H
 
+
+DATA_PACKET PROCESS_MESSAGE_BUFFER_TO_DATA_PACKET(char *BUFFER);
 DATA_PACKET PROCESS_DATA_PACKET(DATA_PACKET data_packet_instance);
 char[] PROCESS_DATA_PACKET_FOR_TRANSMISSION(DATA_PACKET data_packet_instance);
 void PRINT_WRONG_COMMAND_ERROR_MESSAGE();
