@@ -120,8 +120,9 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
 	}
 
 	do {
-        char BUFFER[BUFSIZ];
-        bzero(BUFFER, sizeof(BUFFER));
+	    char TEST[BUFSIZ];
+        char *BUFFER;
+        bzero(BUFFER, sizeof(TEST));
         if((rval = read(file_descriptor, BUFFER, BUFSIZ)) < 0){
             perror("reading stream message");
         }else if(rval == 0){
@@ -161,11 +162,9 @@ void handle_ipv4_connection(int file_descriptor, struct sockaddr_in client){
             char *result;
             //got updated data_packet_instance
             //start to process data_packet to buffer
-            result = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
-            BUFFER = result;
+            BUFFER = PROCESS_DATA_PACKET_FOR_TRANSMISSION(data_packet_instance);
+
             if(strcmp(data_packet_instance.command_type, ftp_server_command_type[SERVER]) == 0 && strcmp(data_packet_instance.command, ftp_server_response_code[SEND_FILE_TO_CLIENT_RESPONSE_CODE]) == 0) {
-
-
                 if((write(file_descriptor, BUFFER, BUFSIZ)) < 0){
                     perror("writing on stream socket");
                     exit(EXIT_FAILURE);
