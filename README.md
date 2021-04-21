@@ -1,4 +1,4 @@
-# ICT374_Assignment02
+# Simple FTP Transfer Protocol
 
 
 
